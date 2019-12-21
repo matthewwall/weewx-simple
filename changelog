@@ -1,0 +1,11 @@
+0.5 14oct2015
+* update readme with weewx 3.x instructions
+
+0.4 01feb2015
+* fixed broken names in install.py
+
+0.3 05feb2014
+* reduced to a single page with no dependencies
+
+0.2 02feb2014
+* initial release

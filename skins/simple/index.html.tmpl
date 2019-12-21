@@ -1,0 +1,624 @@
+## simple for weewx - Copyright 2013-2014 Matthew Wall
+## $Id: index.html.tmpl 1321 2015-06-08 15:25:25Z mwall $
+#errorCatcher Echo
+#encoding UTF-8
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head profile="http://www.w3.org/2005/10/profile">
+    <!-- The simple skin for weewx - Copyright 2013-2014 Matthew Wall -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>$station.location Weather</title>
+    <style>
+body {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  background-color: $Extras.BG_COLOR;
+  color: $Extras.FG_COLOR;
+}
+h1 {
+  font-size: 110%;
+}
+h2 {
+  font-size: 100%;
+}
+a:link {
+  text-decoration: none;
+  color: $Extras.LINK_COLOR;
+}
+a:hover {
+  text-decoration: none;
+  color: $Extras.HOVER_COLOR;
+  background-color: $Extras.HOVER_BG_COLOR;
+}
+a:visited {
+  text-decoration: none;
+  color: $Extras.VISITED_COLOR;
+}
+
+#header {
+  clear: both;
+  margin: 0;
+  padding: 0;
+}
+
+#content {
+  clear: both;
+}
+
+#station_info {
+  float: left;
+  line-height: 95%;
+}
+.station_title {
+  font-size: 120%;
+  font-weight: bold;
+}
+.station_location {
+  font-size: 75%;
+}
+.station_time {
+  font-size: 75%;
+}
+
+.data_graphs {
+}
+.data_table {
+  float: right;
+}
+
+#footer {
+  padding-top: 50px;
+}
+#footer table {
+  font-size: 8pt;
+  font-style: italic;
+  color: #aaaaaa;
+}
+#footer td.label {
+  text-align: right;
+}
+
+.metrics_table {
+  font-size: 80%;
+}
+.metric_name {
+  text-align: right;
+}
+.metric_large {
+  text-align: left;
+  font-weight: bold;
+  font-size: 230%;
+  color: $Extras.LARGE_COLOR;
+}
+.metric_value {
+  text-align: left;
+  font-weight: bold;
+}
+.metric_units {
+  text-align: left;
+}
+.hilo_time {
+  text-align: left;
+  color: #aaaaaa;
+  font-size: 85%;
+}
+.heatindex {
+  color: $Extras.HEATINDEX_COLOR;
+}
+.windchill {
+  color: $Extras.WINDCHILL_COLOR;
+}
+.table_heading {
+  font-size: 80%;
+  color: #888888;
+  border-bottom: 1px solid #cccccc;
+}
+
+.navigation {
+  float: right;
+}
+.period {
+  padding-left: 25px;
+  padding-right: 25px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  background-color: $Extras.BG_COLOR;
+  border: 1px solid $Extras.VISITED_COLOR;
+  cursor: pointer;
+}
+.period_selected {
+  padding-left: 25px;
+  padding-right: 25px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  background-color: $Extras.HOVER_BG_COLOR;
+  border: 1px solid $Extras.VISITED_COLOR;
+  cursor: pointer;
+}
+    </style>
+    <script>
+var periods = ['day','week','month','year'];
+function choose(id) {
+  for(var i=0; i<periods.length; i++) {
+    var c = document.getElementById('control_'+periods[i]);
+    if(c) c.className = (periods[i] == id) ? 'period_selected' : 'period';
+    var g = document.getElementById('graphs_'+periods[i]);
+    if(g) g.style.display = (periods[i] == id) ? 'block' : 'none';
+  }
+}
+    </script>
+  </head>
+
+  <body>
+    <div id='header'>
+      <div id='station_info'>
+        <span class='station_title'>$station.location</span><br/>
+        <span class='station_time'>$current.dateTime</span>
+      </div>
+      <div class='navigation'>
+        <a class='period_selected' id='control_day' onclick="choose('day')">Day</a>
+        <a class='period' id='control_week' onclick="choose('week')">Week</a>
+        <a class='period' id='control_month' onclick="choose('month')">Month</a>
+        <a class='period' id='control_year' onclick="choose('year')">Year</a>
+      </div>
+    </div>
+    <div id='content'>
+      <div class='data_table'>
+
+<!-- current readings in tabular form -->
+
+<table class='metrics_table'>
+  <tr>
+    <td></td>
+    <td class='table_heading' colspan="2">ACTUAL</td>
+    <td class='table_heading'>HI/LO</td>
+    <td></td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class='metric_name'>Temperature</td>
+    <td class='metric_large'>$current.outTemp.formatted</td>
+    <td class='metric_value'><span class='heatindex'>$current.heatindex.formatted</span><br/><span class='windchill'>$current.windchill.formatted</span></td>
+    <td class='metric_value'>
+      $day.outTemp.max.formatted<br/>
+      $day.outTemp.min.formatted</td>
+    <td class='metric_units'>$unit.label.outTemp</td>
+  </tr>
+
+  <tr style='vertical-align:top'>
+    <td class='metric_name'>Humidity</td>
+    <td class='metric_large' colspan='2' >$current.outHumidity.formatted</td>
+    <td class='metric_value'>
+      $day.outHumidity.max.formatted<br/>
+      $day.outHumidity.min.formatted</td>
+    <td class='metric_units'>$unit.label.outHumidity</td>
+  </tr>
+
+  <tr style='vertical-align:top'>
+    <td class='metric_name'>Dewpoint</td>
+    <td class='metric_large' colspan='2' >$current.dewpoint.formatted</td>
+    <td class='metric_value'>
+      $day.dewpoint.max.formatted<br/>
+      $day.dewpoint.min.formatted</td>
+    <td class='metric_units'>$unit.label.dewpoint</td>
+  </tr>
+
+  <tr style='vertical-align:top'>
+    <td class='metric_name'>Barometer</td>
+    <td class='metric_large' colspan='2' >$current.barometer.formatted</td>
+    <td class='metric_value'>
+      $day.barometer.max.formatted<br/>
+      $day.barometer.min.formatted</td>
+    <td class='metric_units'>$unit.label.barometer<br/>
+<!-- note: these thresholds are for millibar, not inHg -->
+#if $varExists('trend')
+#if $trend.barometer.raw is not None:
+#if $trend.barometer.raw > 6
+      &#8679;&#8679;&#8679;
+#elif $trend.barometer.raw > 3
+      &#8679;&#8679;
+#elif $trend.barometer.raw > 0.5
+      &#8679;
+#elif $trend.barometer.raw < -6
+      &#8681;&#8681;&#8681;
+#elif $trend.barometer.raw < -3
+      &#8681;&#8681;
+#elif $trend.barometer.raw < 0.5
+      &#8681;
+#end if
+#end if
+#end if
+    </td>
+  </tr>
+
+  <tr style='vertical-align:top'>
+    <td class='metric_name'>Wind</td>
+    <td class='metric_large' colspan='2' >
+      <table cellspacing='0' cellpadding='0'><tr>
+      <td>$current.windSpeed.formatted</td>
+      <td style='font-size:50%;padding-left:8px;'>
+        $current.windDir.ordinal_compass<br/>
+        <span style='font-size:90%'>$current.windDir</span>
+      </td>
+      <td style='padding-left:8px;'>
+#if $current.windDir.raw is None:
+      -
+#else
+#if $current.windDir.raw < 22.5
+      &#8593;
+#elif $current.windDir.raw < 67.5
+      &#8599;
+#elif $current.windDir.raw < 112.5
+      &#8594;
+#elif $current.windDir.raw < 157.5
+      &#8600;
+#elif $current.windDir.raw < 202.5
+      &#8595;
+#elif $current.windDir.raw < 247.5
+      &#8601;
+#elif $current.windDir.raw < 292.5
+      &#8592;
+#elif $current.windDir.raw < 337.5
+      &#8598;
+#else
+      &#8593;
+#end if
+#end if
+      </td>
+      </tr></table>
+    </td>
+    <td>
+      <span class='metric_value' title='maximum wind speed'>$day.wind.max.formatted</span><br/>
+      <span class='metric_value' title='average wind speed'>$day.wind.avg.formatted</span> avg
+    </td>
+    <td class='metric_units'>$unit.label.windSpeed<br/>
+#if $varExists('trend')
+#if $trend.windSpeed.raw is not None:
+#if $trend.windSpeed.formatted > 0
+      &#8679;
+#elif $trend.windSpeed.formatted < 0
+      &#8681;
+#end if
+#end if
+#end if
+    </td>
+  </tr>
+
+  <tr style='vertical-align:top'>
+    <td class='metric_name'>Precipitation</td>
+    <td class='metric_large' colspan='2' >
+      <span title='rainfall within the past few minutes'>
+        $current.rain.formatted</span>
+    </td>
+    <td class='metric_value'>
+      <span title='maximum rain rate this day'>$day.rainRate.max.formatted</span><br/>
+      <span title='total rainfall this day'>$day.rain.sum.formatted</span>
+    </td>
+    <td class='metric_units'>
+      $unit.label.rainRate<br/>
+      $unit.label.rain
+    </td>
+  </tr>
+
+#if $day.UV.has_data
+  <tr style='vertical-align:top'>
+    <td class='metric_name'>UV</td>
+    <td class='metric_large' colspan='2' >
+      <span title='UV Index'>$current.UV.formatted</span>
+    </td>
+    <td class='metric_value'>
+      <span title='maximum UV this day'>$day.UV.max.formatted</span><br/>
+      <span title='minimum UV this day'>$day.UV.min.formatted</span>
+    </td>
+    <td></td>
+  </tr>
+#end if
+
+  <tr style='vertical-align:top'>
+    <td class='metric_name'>Temperature<br/>Inside</td>
+    <td class='metric_large' colspan='2' >$current.inTemp.formatted</td>
+    <td class='metric_value'>
+      $day.inTemp.max.formatted<br/>
+      $day.inTemp.min.formatted
+    </td>
+    <td class='metric_units'>$unit.label.outTemp</td>
+  </tr>
+
+  <tr style='vertical-align:top'>
+    <td class='metric_name'>Humidity<br/>Inside</td>
+    <td class='metric_large' colspan='2' >$current.inHumidity.formatted</td>
+    <td class='metric_value'>
+      $day.inHumidity.max.formatted<br/>
+      $day.inHumidity.min.formatted
+    </td>
+    <td class='metric_units'>$unit.label.outHumidity</td>
+  </tr>
+</table>
+
+        <p>&nbsp;</p>
+
+<!-- hi/lo readings in tabular form -->
+
+<table class='metrics_table'>
+  <tr>
+    <td></td>
+    <td class="table_heading">TODAY</td>
+    <td class="table_heading">MONTH</td>
+    <td class="table_heading">YEAR</td>
+    <td></td>
+  </tr>
+
+  <!-- outside -->
+
+  <tr style='vertical-align:top'>
+    <td class="metric_name">High Temperature:</td>
+    <td><span class="metric_value">$day.outTemp.max.formatted</span><br/>
+      <span class="hilo_time">$day.outTemp.maxtime</span></td>
+    <td><span class="metric_value">$month.outTemp.max.formatted</span><br/>
+      <span class="hilo_time">$month.outTemp.maxtime</span></td>
+    <td><span class="metric_value">$year.outTemp.max.formatted</span><br/>
+      <span class="hilo_time">$year.outTemp.maxtime</span></td>
+    <td class="metric_units">$unit.label.outTemp</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">Low Temperature:</td>
+    <td><span class="metric_value">$day.outTemp.min.formatted</span><br/>
+      <span class="hilo_time">$day.outTemp.mintime</span></td>
+    <td><span class="metric_value">$month.outTemp.min.formatted</span><br/>
+      <span class="hilo_time">$month.outTemp.mintime</span></td>
+    <td><span class="metric_value">$year.outTemp.min.formatted</span><br/>
+      <span class="hilo_time">$year.outTemp.mintime</span></td>
+    <td class="metric_units">$unit.label.outTemp</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">High Humidity:</td>
+    <td><span class="metric_value">$day.outHumidity.max.formatted</span><br/>
+      <span class="hilo_time">$day.outHumidity.maxtime</span></td>
+    <td><span class="metric_value">$month.outHumidity.max.formatted</span><br/>
+      <span class="hilo_time">$month.outHumidity.maxtime</span></td>
+    <td><span class="metric_value">$year.outHumidity.max.formatted</span><br/>
+      <span class="hilo_time">$year.outHumidity.maxtime</span></td>
+    <td class="metric_units">$unit.label.outHumidity</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">Low Humidity:</td>
+    <td><span class="metric_value">$day.outHumidity.min.formatted</span><br/>
+      <span class="hilo_time">$day.outHumidity.mintime</span></td>
+    <td><span class="metric_value">$month.outHumidity.min.formatted</span><br/>
+      <span class="hilo_time">$month.outHumidity.mintime</span></td>
+    <td><span class="metric_value">$year.outHumidity.min.formatted</span><br/>
+      <span class="hilo_time">$year.outHumidity.mintime</span></td>
+    <td class="metric_units">$unit.label.outHumidity</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">High Dewpoint:</td>
+    <td><span class="metric_value">$day.dewpoint.max.formatted</span><br/>
+      <span class="hilo_time">$day.dewpoint.maxtime</span></td>
+    <td><span class="metric_value">$month.dewpoint.max.formatted</span><br/>
+      <span class="hilo_time">$month.dewpoint.maxtime</span></td>
+    <td><span class="metric_value">$year.dewpoint.max.formatted</span><br/>
+      <span class="hilo_time">$year.dewpoint.maxtime</span></td>
+    <td class="metric_units">$unit.label.dewpoint</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">Low Dewpoint:</td>
+    <td><span class="metric_value">$day.dewpoint.min.formatted</span><br/>
+      <span class="hilo_time">$day.dewpoint.mintime</span></td>
+    <td><span class="metric_value">$month.dewpoint.min.formatted</span><br/>
+      <span class="hilo_time">$month.dewpoint.mintime</span></td>
+    <td><span class="metric_value">$year.dewpoint.min.formatted</span><br/>
+      <span class="hilo_time">$year.dewpoint.mintime</span></td>
+    <td class="metric_units">$unit.label.dewpoint</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">High Barometer:</td>
+    <td><span class="metric_value">$day.barometer.max.formatted</span><br/>
+      <span class="hilo_time">$day.barometer.maxtime</span></td>
+    <td><span class="metric_value">$month.barometer.max.formatted</span><br/>
+      <span class="hilo_time">$month.barometer.maxtime</span></td>
+    <td><span class="metric_value">$year.barometer.max.formatted</span><br/>
+      <span class="hilo_time">$year.barometer.maxtime</span></td>
+    <td class="metric_units">$unit.label.barometer</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">Low Barometer:</td>
+    <td><span class="metric_value">$day.barometer.min.formatted</span><br/>
+      <span class="hilo_time">$day.barometer.mintime</span></td>
+    <td><span class="metric_value">$month.barometer.min.formatted</span><br/>
+      <span class="hilo_time">$month.barometer.mintime</span></td>
+    <td><span class="metric_value">$year.barometer.min.formatted</span><br/>
+      <span class="hilo_time">$year.barometer.mintime</span></td>
+    <td class="metric_units">$unit.label.barometer</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">High Heat Index:</td>
+    <td><span class="metric_value">$day.heatindex.max.formatted</span><br/>
+      <span class="hilo_time">$day.heatindex.maxtime</span></td>
+    <td><span class="metric_value">$month.heatindex.max.formatted</span><br/>
+      <span class="hilo_time">$month.heatindex.maxtime</span></td>
+    <td><span class="metric_value">$year.heatindex.max.formatted</span><br/>
+      <span class="hilo_time">$year.heatindex.maxtime</span></td>
+    <td class="metric_units">$unit.label.heatindex</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">Low Wind Chill:</td>
+    <td><span class="metric_value">$day.windchill.min.formatted</span><br/>
+      <span class="hilo_time">$day.windchill.mintime</span></td>
+    <td><span class="metric_value">$month.windchill.min.formatted</span><br/>
+      <span class="hilo_time">$month.windchill.mintime</span></td>
+    <td><span class="metric_value">$year.windchill.min.formatted</span><br/>
+      <span class="hilo_time">$year.windchill.mintime</span></td>
+    <td class="metric_units">$unit.label.windchill</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">High Wind Speed:</td>
+    <td><span class="metric_value">$day.wind.max.formatted</span><br/>
+      <span class="hilo_time">$day.wind.maxtime</span></td>
+    <td><span class="metric_value">$month.wind.max.formatted</span><br/>
+      <span class="hilo_time">$month.wind.maxtime</span></td>
+    <td><span class="metric_value">$year.wind.max.formatted</span><br/>
+      <span class="hilo_time">$year.wind.maxtime</span></td>
+    <td class="metric_units">$unit.label.wind</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">Ave Wind Speed:</td>
+    <td><span class="metric_value">$day.wind.avg.formatted</span></td>
+    <td><span class="metric_value">$month.wind.avg.formatted</span></td>
+    <td><span class="metric_value">$year.wind.avg.formatted</span></td>
+    <td class="metric_units">$unit.label.wind</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">High Rain Rate:</td>
+    <td><span class="metric_value">$day.rainRate.max.formatted</span><br/>
+      <span class="hilo_time">$day.rainRate.maxtime</span></td>
+    <td><span class="metric_value">$month.rainRate.max.formatted</span><br/>
+      <span class="hilo_time">$month.rainRate.maxtime</span></td>
+    <td><span class="metric_value">$year.rainRate.max.formatted</span><br/>
+      <span class="hilo_time">$year.rainRate.maxtime</span></td>
+    <td class="metric_units">$unit.label.rainRate</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">Rain Total:</td>
+    <td><span class="metric_value">$day.rain.sum.formatted</span><br/></td>
+    <td><span class="metric_value">$month.rain.sum.formatted</span></td>
+    <td><span class="metric_value">$year.rain.sum.formatted</span></td>
+    <td class="metric_units">$unit.label.rain</td>
+  </tr>
+
+  <!-- inside -->
+
+  <tr><td>&nbsp;</td></tr>
+  <tr><td></td><td colspan='3' class='table_heading'>INSIDE</td></tr>
+
+  <tr style='vertical-align:top'>
+    <td class="metric_name">High Temperature:</td>
+    <td><span class="metric_value">$day.inTemp.max.formatted</span><br/>
+      <span class="hilo_time">$day.inTemp.maxtime</span></td>
+    <td><span class="metric_value">$month.inTemp.max.formatted</span><br/>
+      <span class="hilo_time">$month.inTemp.maxtime</span></td>
+    <td><span class="metric_value">$year.inTemp.max.formatted</span><br/>
+      <span class="hilo_time">$year.inTemp.maxtime</span></td>
+    <td class="metric_units">$unit.label.inTemp</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">Low Temperature:</td>
+    <td><span class="metric_value">$day.inTemp.min.formatted</span><br/>
+      <span class="hilo_time">$day.inTemp.mintime</span></td>
+    <td><span class="metric_value">$month.inTemp.min.formatted</span><br/>
+      <span class="hilo_time">$month.inTemp.mintime</span></td>
+    <td><span class="metric_value">$year.inTemp.min.formatted</span><br/>
+      <span class="hilo_time">$year.inTemp.mintime</span></td>
+    <td class="metric_units">$unit.label.inTemp</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">High Humidity:</td>
+    <td><span class="metric_value">$day.inHumidity.max.formatted</span><br/>
+      <span class="hilo_time">$day.inHumidity.maxtime</span></td>
+    <td><span class="metric_value">$month.inHumidity.max.formatted</span><br/>
+      <span class="hilo_time">$month.inHumidity.maxtime</span></td>
+    <td><span class="metric_value">$year.inHumidity.max.formatted</span><br/>
+      <span class="hilo_time">$year.inHumidity.maxtime</span></td>
+    <td class="metric_units">$unit.label.inHumidity</td>
+  </tr>
+  <tr style='vertical-align:top'>
+    <td class="metric_name">Low Humidity:</td>
+    <td><span class="metric_value">$day.inHumidity.min.formatted</span><br/>
+      <span class="hilo_time">$day.inHumidity.mintime</span></td>
+    <td><span class="metric_value">$month.inHumidity.min.formatted</span><br/>
+      <span class="hilo_time">$month.inHumidity.mintime</span></td>
+    <td><span class="metric_value">$year.inHumidity.min.formatted</span><br/>
+      <span class="hilo_time">$year.inHumidity.mintime</span></td>
+    <td class="metric_units">$unit.label.inHumidity</td>
+  </tr>
+</table>
+
+<div id='footer'>
+  <table>
+    <tr><td class='label'>altitude:</td>
+      <td>$station.altitude</td></tr>
+    <tr><td class='label'>location:</td>
+      <td>$station.latitude[0]&deg; $station.latitude[1]' $station.latitude[2], $station.longitude[0]&deg; $station.longitude[1]' $station.longitude[2]</td></tr>
+    <tr><td class='label'>station:</td>
+      <td>$station.hardware</td></tr>
+    <tr><td class='label'>server:</td>
+      <td>$station.os_uptime</td></tr>
+    <tr><td class='label'>weewx:</td>
+      <td>$station.uptime</td></tr>
+    <tr><td></td>
+      <td>$station.version</td></tr>
+  </table>
+</div>
+
+      </div>
+
+      <div id='graphs_day' class='data_graphs'>
+        <img src="dayinouttempdew.png" alt="temperatures" />
+        <img src="dayinouthum.png" alt="humidity" />
+        <img src="daybarometer.png" alt="barometer"/>
+        <img src="daytempchill.png" alt="heatchill" />
+        <img src="daywind.png" alt="wind" />
+        <img src="daywinddir.png" alt="wind direction" />
+        <img src="daywindvec.png" alt="wind vectors" />
+        <img src="dayrain.png" alt="rain" />
+        #if $day.radiation.has_data
+        <img src="dayradiation.png" alt="radiation" />
+        #end if
+        #if $day.UV.has_data
+        <img src="dayuv.png" alt="uv" />
+        #end if
+      </div>
+
+      <div id='graphs_week' class='data_graphs' style='display:none'>
+        <img src="weekinouttempdew.png" alt="temperatures" />
+        <img src="weekinouthum.png" alt="humidity" />
+        <img src="weekbarometer.png" alt="barometer"/>
+        <img src="weektempchill.png" alt="heatchill" />
+        <img src="weekwind.png" alt="wind" />
+        <img src="weekwinddir.png" alt="wind direction" />
+        <img src="weekwindvec.png" alt="wind vectors" />
+        <img src="weekrain.png" alt="rain" />
+        #if $week.radiation.has_data
+        <img src="weekradiation.png" alt="radiation" />
+        #end if
+        #if $week.UV.has_data
+        <img src="weekuv.png" alt="uv" />
+        #end if
+      </div>
+
+      <div id='graphs_month' class='data_graphs' style='display:none'>
+        <img src="monthinouttempdew.png" alt="temperatures" />
+        <img src="monthinouthum.png" alt="humidity" />
+        <img src="monthbarometer.png" alt="barometer"/>
+        <img src="monthtempchill.png" alt="heatchill" />
+        <img src="monthwind.png" alt="wind" />
+        <img src="monthwinddir.png" alt="wind direction" />
+        <img src="monthwindvec.png" alt="wind vectors" />
+        <img src="monthrain.png" alt="rain" />
+        #if $month.radiation.has_data
+        <img src="monthradiation.png" alt="radiation" />
+        #end if
+        #if $month.UV.has_data
+        <img src="monthuv.png" alt="uv" />
+        #end if
+      </div>
+
+      <div id='graphs_year' class='data_graphs' style='display:none'>
+        <img src="yearinouttempdew.png" alt="temperatures" />
+        <img src="yearinouthum.png" alt="humidity" />
+        <img src="yearbarometer.png" alt="barometer"/>
+        <img src="yeartempchill.png" alt="heatchill" />
+        <img src="yearwind.png" alt="wind" />
+        <img src="yearwinddir.png" alt="wind direction" />
+        <img src="yearwindvec.png" alt="wind vectors" />
+        <img src="yearrain.png" alt="rain" />
+        #if $year.radiation.has_data
+        <img src="yearradiation.png" alt="radiation" />
+        #end if
+        #if $year.UV.has_data
+        <img src="yearuv.png" alt="uv" />
+        #end if
+      </div>
+
+    </div>
+
+  </body>
+</html>
